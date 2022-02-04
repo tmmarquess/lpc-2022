@@ -1,6 +1,6 @@
-from ctypes import sizeof
 import math
 import turtle
+import random
 
 def desenhar_quadrados(escala,n):
     """Desenha os quadrados com lado de tamanho igual aos
@@ -64,11 +64,9 @@ def desenhar_espiral(escala,n):
         #Imprimindo o raio do quarto de circunferencia na tela
         print(fibonacci)
 
-        #Definindo a cor da caneta
-        desenho.pencolor(cores[cor_atual])
-        cor_atual += 1
-        if cor_atual == len(cores):
-            cor_atual = 0
+        desenho.pencolor(aleatorio.randint(0,255),
+                        aleatorio.randint(0,255),
+                        aleatorio.randint(0,255))
 
         #Definindo a distância que o pincel irá andar
         andar = math.pi * fibonacci * escala /2
@@ -89,15 +87,16 @@ turtle.bgcolor("black")
 turtle.title("Espiral de Fibonacci")
 desenho.speed("fastest")
 
-#Lista com códigos de cores
-cores = ["#ff0000","#ffa500","#ffff00","#008000",
-        "#0000ff","#4b0082","#ee82ee"]
-
 #Escala do desenho
 escala = 12
 
 #Repetição da sequencia
 n = 8
+
+#mudando o modo de cor do Turtle e 
+# iniciando o algoritimo aleatório
+turtle.colormode(255)
+aleatorio = random.Random()
 
 desenhar_quadrados(escala,n)
 desenhar_espiral(escala,n)
