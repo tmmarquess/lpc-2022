@@ -1,7 +1,7 @@
 import turtle
 
 
-def desenhar_y(tamanho, nivel):
+def desenhar_y(size, nivel):
     """Desenha a arvore a partir do tamanho de linha
     e quantidade de níveis definidas
     """
@@ -11,20 +11,20 @@ def desenhar_y(tamanho, nivel):
         caneta.pencolor(0, 255 // nivel, 0)
 
         # Desenhando a linha
-        caneta.forward(tamanho)
+        caneta.forward(size)
         caneta.right(angulo)
 
-        desenhar_y(tamanho * 0.8, nivel - 1)
+        desenhar_y(size * 0.8, nivel - 1)
 
         caneta.left(2 * angulo)
         caneta.pencolor(0, 255 // nivel, 0)
 
-        desenhar_y(tamanho * 0.8, nivel - 1)
+        desenhar_y(size * 0.8, nivel - 1)
 
         caneta.pencolor(0, 255 // nivel, 0)
 
         caneta.right(angulo)
-        caneta.forward(-1 * tamanho)
+        caneta.forward(-1 * size)
 
 
 # Configurando a caneta do turtle

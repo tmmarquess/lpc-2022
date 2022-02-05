@@ -3,14 +3,13 @@ import turtle
 import random
 
 
-def desenhar_quadrados(escala, n):
+def desenhar_quadrados():
     """Desenha os quadrados com lado de tamanho igual aos
     n primeiros termos da sequencia de fibonacci
     """
     # Variáveis para Fibonacci
     fibonacci = 1
     anterior = 0
-    temporario = 0
 
     # Definindo a cor da caneta
     desenho.pencolor("blue")
@@ -50,17 +49,13 @@ def desenhar_quadrados(escala, n):
     desenho.pendown()
 
 
-def desenhar_espiral(escala, n):
+def desenhar_espiral():
     """Desenha a espiral de acordo com a escala com raio de acordo
     com os n primeiros termos da sequencia de fibonacci
     """
     # Variáveis para Fibonacci
     fibonacci = 1
     anterior = 0
-    temporario = 0
-
-    # Definindo a cor da caneta
-    cor_atual = 0
 
     for i in range(n):
         # Imprimindo o raio do quarto de circunferencia na tela
@@ -103,7 +98,7 @@ n = 8
 turtle.colormode(255)
 aleatorio = random.Random()
 
-desenhar_quadrados(escala, n)
-desenhar_espiral(escala, n)
+desenhar_quadrados()
+desenhar_espiral()
 
 turtle.done()
