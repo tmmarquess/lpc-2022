@@ -78,6 +78,90 @@ class Paddle(pygame.sprite.Sprite):
         self.player_input()
 
 
+# Function to check collision between the ball and the paddle
+def ball_paddle_collision():
+    collision = pygame.sprite.spritecollide(ball.sprite, paddle, False)
+    if collision:
+
+        if collision[0].rect.collidepoint(ball.sprite.rect.midbottom):
+            ball.sprite.dy *= -1
+
+        elif collision[0].rect.collidepoint(ball.sprite.rect.bottomleft):
+            ball.sprite.dx *= -1
+            ball.sprite.dy *= -1
+            ball.sprite.rect.bottomleft = collision[0].rect.topright
+
+        elif collision[0].rect.collidepoint(ball.sprite.rect.bottomright):
+            ball.sprite.dx *= -1
+            ball.sprite.dy *= -1
+            ball.sprite.rect.bottomright = collision[0].rect.topleft
+
+        if collision[0].rect.collidepoint(ball.sprite.rect.midleft):
+            ball.sprite.dx *= -1
+            ball.sprite.dy *= -1
+            ball.sprite.rect.left = collision[0].rect.right
+
+        elif collision[0].rect.collidepoint(ball.sprite.rect.topleft):
+            ball.sprite.dx *= -1
+            ball.sprite.dy *= -1
+            ball.sprite.rect.topleft = collision[0].rect.bottomright
+
+        if collision[0].rect.collidepoint(ball.sprite.rect.midright):
+            ball.sprite.dx *= -1
+            ball.sprite.dy *= -1
+            ball.sprite.rect.right = collision[0].rect.left
+
+        elif collision[0].rect.collidepoint(ball.sprite.rect.topright):
+            ball.sprite.dx *= -1
+            ball.sprite.dy *= -1
+            ball.sprite.rect.topright = collision[0].rect.bottomleft
+
+
+# Function to check collision between the ball and an obstacle
+def ball_obstacle_collision():
+    collision = pygame.sprite.spritecollide(ball.sprite, obstacles, True)
+
+    if collision:
+
+        for obstacle in collision:
+
+            if obstacle.rect.collidepoint(ball.sprite.rect.midtop):
+                ball.sprite.dy *= -1
+                ball.sprite.rect.top = obstacle.rect.bottom
+
+            if obstacle.rect.collidepoint(ball.sprite.rect.midbottom):
+                ball.sprite.dy *= -1
+                ball.sprite.rect.bottom = obstacle.rect.top
+
+            if obstacle.rect.collidepoint(ball.sprite.rect.midright):
+                ball.sprite.dx *= -1
+                ball.sprite.rect.right = obstacle.rect.left
+
+            if obstacle.rect.collidepoint(ball.sprite.rect.midleft):
+                ball.sprite.dx *= -1
+                ball.sprite.rect.left = obstacle.rect.right
+
+            if obstacle.rect.collidepoint(ball.sprite.rect.topleft):
+                ball.sprite.dx *= -1
+                ball.sprite.dy *= -1
+                ball.sprite.rect.topleft = obstacle.rect.bottomright
+
+            if obstacle.rect.collidepoint(ball.sprite.rect.topright):
+                ball.sprite.dx *= -1
+                ball.sprite.dy *= -1
+                ball.sprite.rect.topright = obstacle.rect.bottomleft
+
+            if obstacle.rect.collidepoint(ball.sprite.rect.bottomleft):
+                ball.sprite.dx *= -1
+                ball.sprite.dy *= -1
+                ball.sprite.rect.bottomleft = obstacle.rect.topright
+
+            if obstacle.rect.collidepoint(ball.sprite.rect.bottomright):
+                ball.sprite.dx *= -1
+                ball.sprite.dy *= -1
+                ball.sprite.rect.bottomright = obstacle.rect.topleft
+
+
 def draw_obstacles():
     # Obstacles coordinates
     x = 0
@@ -139,6 +223,9 @@ while True:
 
     ball.draw(screen)
     ball.update()
+
+    ball_paddle_collision()
+    ball_obstacle_collision()
 
     pygame.display.update()
     clock.tick(60)
