@@ -48,6 +48,7 @@ class Ball(pygame.sprite.Sprite):
             self.dy *= -1
 
         if self.rect.y >= 758:
+            ball_death()
             self.kill()
 
     def update(self):
@@ -131,6 +132,7 @@ def ball_obstacle_collision():
         collision = pygame.sprite.spritecollide(ball.sprite, obstacles, True)
 
     if collision:
+
         for obstacle in collision:
 
             if obstacle.rect.collidepoint(ball.sprite.rect.midtop):
@@ -169,6 +171,48 @@ def ball_obstacle_collision():
                 ball.sprite.dy *= -1
                 ball.sprite.rect.bottomright = obstacle.rect.topleft
 
+            if game_active is True:
+                update_ball_speed(obstacle.score)
+
+
+# Function to update ball speed according to the conditions
+def update_ball_speed(obstacle_score):
+    global counter_4, counter_12
+
+    counter_4 += 1
+    counter_12 += 1
+
+    if counter_4 % 4 == 0 or counter_12 % 12 == 0 or 7 >= obstacle_score >= 5:
+        dx = ball.sprite.dx
+        dy = ball.sprite.dy
+        negative_x = False
+        negative_y = False
+
+        if dx < 0:
+            negative_x = True
+            dx *= -1
+        if dy < 0:
+            negative_y = True
+            dy *= -1
+
+        dx += 0.4
+        dy += 0.4
+
+        if negative_x is True:
+            dx *= -1
+        if negative_y is True:
+            dy *= -1
+
+        ball.sprite.dx = dx
+        ball.sprite.dy = dy
+
+        update_paddle_speed()
+
+
+# Function to update the paddle speed
+def update_paddle_speed():
+    paddle.sprite.speed += 0.2
+
 
 def draw_obstacles():
     # Obstacles coordinates
@@ -187,6 +231,15 @@ def draw_obstacles():
             x = 0
             dist += 17
         obstacle_type += 1
+
+
+# Function for when the ball dies
+def ball_death():
+    global ball_on_screen, counter_4, counter_12
+    ball_on_screen = False
+
+    paddle.sprite.speed = 5
+    counter_4 = counter_12 = 0
 
 
 # Function to show an arcade main screen
@@ -213,6 +266,10 @@ game_active = False
 
 # Defines if the ball exists
 ball_on_screen = True
+
+# Speed Counters
+counter_4 = 0
+counter_12 = 0
 
 # Creating the Sprite group of obstacles
 obstacles = pygame.sprite.Group()
