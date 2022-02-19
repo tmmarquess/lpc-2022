@@ -1,0 +1,22 @@
+# Desenvolvimento
+- **Tela do jogo**
+    - draw_ball() -- *classe da bola*
+    - draw_rectangles() -- *classe dos retângulos*
+    - draw_paddle() -- *classe da raquete*
+- **Personagem e suas movimentações**
+    - class Ball
+    - class Obstacle
+    - class Paddle
+- **Game Loop**
+    - **Controles e eventos**
+        - Controle da raquete dentro da classe
+        - Evento de colisão com classe de Sprites
+        - Pontuação sendo feita junto com a colisão
+        - evento de atualizar bola
+        - evento de atualizar raquete
+        - evento de atualizar retangulos
+    - **Mecânicas**
+        - Rebater -- *Chamada da função de rebater no game loop*
+        - Bater na Parede -- *função para verificar colisão*
+        - Pontuar -- *junto com a função de colisão*
+        - Cada vez que a bola rebate em um retângulo, aumenta de velocidade
