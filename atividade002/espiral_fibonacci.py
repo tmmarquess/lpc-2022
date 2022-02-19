@@ -1,6 +1,6 @@
 import math
-import turtle
 import random
+import turtle
 
 
 def desenhar_quadrados():
