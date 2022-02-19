@@ -1,5 +1,6 @@
 import pygame
 from random import choice, randint
+from sys import exit
 
 
 # Class of the Obstacles
@@ -55,14 +56,19 @@ class Ball(pygame.sprite.Sprite):
 
 # Class of the paddle
 class Paddle(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, first: bool):
         super().__init__()
-        self.image = pygame.surface.Surface((35, 15))
+        if first:
+            self.image = pygame.surface.Surface((263 * 2, 15))
+        else:
+            self.image = pygame.surface.Surface((35, 15))
         self.image.fill("#00476D")
         self.rect = self.image.get_rect(midbottom=(263, 724))
         self.speed = 5
 
     def player_input(self):
+        if game_active is not True:
+            return
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
@@ -119,10 +125,12 @@ def ball_paddle_collision():
 
 # Function to check collision between the ball and an obstacle
 def ball_obstacle_collision():
-    collision = pygame.sprite.spritecollide(ball.sprite, obstacles, True)
+    if game_active is not True:
+        collision = pygame.sprite.spritecollide(ball.sprite, obstacles, False)
+    else:
+        collision = pygame.sprite.spritecollide(ball.sprite, obstacles, True)
 
     if collision:
-
         for obstacle in collision:
 
             if obstacle.rect.collidepoint(ball.sprite.rect.midtop):
@@ -181,6 +189,12 @@ def draw_obstacles():
         obstacle_type += 1
 
 
+# Function to show an arcade main screen
+def start_screen():
+    paddle.add(Paddle(True))
+    ball.add(Ball((randint(20, 506), randint(250, 379))))
+
+
 # Initializing Pygame Instance
 pygame.init()
 
@@ -194,24 +208,46 @@ pygame.display.set_caption("Breakout")
 # the clock that defines the speed of the loop
 clock = pygame.time.Clock()
 
+# Defines if the game is active
+game_active = False
+
+# Defines if the ball exists
+ball_on_screen = True
+
 # Creating the Sprite group of obstacles
 obstacles = pygame.sprite.Group()
 
 # Paddle Group
 paddle = pygame.sprite.GroupSingle()
-paddle.add(Paddle())
 
 # Ball Group
 ball = pygame.sprite.GroupSingle()
-ball.add(Ball((randint(20, 506), randint(250, 379))))
 
 draw_obstacles()
+start_screen()
 # Game Loop
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if game_active is not True:
+                obstacles.empty()
+                draw_obstacles()
+
+                paddle.empty()
+                paddle.add(Paddle(False))
+
+                game_active = True
+
+                ball_on_screen = False
+                ball.empty()
+
+            else:
+                if ball_on_screen is not True:
+                    ball.add(Ball((randint(20, 506), randint(250, 379))))
+                    ball_on_screen = True
 
     screen.fill("black")
 
@@ -224,8 +260,9 @@ while True:
     ball.draw(screen)
     ball.update()
 
-    ball_paddle_collision()
-    ball_obstacle_collision()
+    if ball_on_screen is True:
+        ball_paddle_collision()
+        ball_obstacle_collision()
 
     pygame.display.update()
     clock.tick(60)
