@@ -85,6 +85,18 @@ class Paddle(pygame.sprite.Sprite):
         self.player_input()
 
 
+# Class for text inputs
+class Texto(pygame.sprite.Sprite):
+    def __init__(self, texto, coord: tuple):
+        super().__init__()
+        self.font = pygame.font.Font(None, 30)
+        self.image = self.font.render(texto, False, "white")
+        self.rect = self.image.get_rect(midtop=coord)
+
+    def update_text(self, text):
+        self.image = self.font.render(text, False, "white")
+
+
 # Function to check collision between the ball and the paddle
 def ball_paddle_collision():
     collision = pygame.sprite.spritecollide(ball.sprite, paddle, False)
@@ -126,7 +138,6 @@ def ball_paddle_collision():
 
 # Function to check collision between the ball and an obstacle
 def ball_obstacle_collision():
-    global current_score
     if game_active is not True:
         collision = pygame.sprite.spritecollide(ball.sprite, obstacles, False)
     else:
@@ -136,7 +147,7 @@ def ball_obstacle_collision():
 
         for obstacle in collision:
 
-            current_score += 20
+            update_score(obstacle.score)
 
             if obstacle.rect.collidepoint(ball.sprite.rect.midtop):
                 ball.sprite.dy *= -1
@@ -176,6 +187,22 @@ def ball_obstacle_collision():
 
             if game_active is True:
                 update_ball_speed(obstacle.score)
+                if len(obstacles) == 0:
+                    update_round()
+
+
+def update_round():
+    global second_round, ball_on_screen, counter_4, counter_12
+    if second_round is not True:
+        second_round = True
+
+        draw_obstacles()
+
+        ball.empty()
+
+        ball_on_screen = False
+        paddle.sprite.speed = 5
+        counter_4 = counter_12 = 0
 
 
 # Function to update ball speed according to the conditions
@@ -215,6 +242,41 @@ def update_ball_speed(obstacle_score):
 # Function to update the paddle speed
 def update_paddle_speed():
     paddle.sprite.speed += 0.2
+
+
+# Function to update the attempt and check if it's over 3
+def update_attempt():
+    global attempt
+    attempt += 1
+    texts.sprites()[2].update_text(f"{attempt}")
+
+    if attempt == 4:
+        game_over()
+
+
+# Function to reset the score
+def reset_score():
+    global score
+    score = 0
+    texts.sprites()[1].update_text(f"{score}")
+
+
+# Function to update the score
+def update_score(points):
+    if game_active is True:
+        global score
+        score += points
+        texts.sprites()[1].update_text(f"{score}")
+
+
+# game over
+def game_over():
+    global game_active, attempt, ball_on_screen
+    attempt = 0
+    paddle.empty()
+    game_active = False
+    ball_on_screen = True
+    start_screen()
 
 
 def draw_obstacles():
@@ -263,15 +325,6 @@ def draw_obstacles_2():
         obstacle_type += 1
 
 
-def display_score():
-    global current_score, game_active
-    if not game_active:
-        current_score = 0
-    score_surface = test_font.render(f'{current_score}', False, 'White')
-    score_rectangle = score_surface.get_rect(center=(400, 50))
-    screen.blit(score_surface, score_rectangle)
-
-
 # Function for when the ball dies
 def ball_death():
     global ball_on_screen, counter_4, counter_12
@@ -280,6 +333,7 @@ def ball_death():
     paddle.sprite.speed = 5
     counter_4 = counter_12 = 0
 
+    update_attempt()
 
 # Function to show an arcade main screen
 def start_screen():
@@ -311,13 +365,21 @@ clock = pygame.time.Clock()
 
 # the game using a default font
 test_font = pygame.font.Font(None, 50)
-current_score = 0
 
 # Defines if the game is active
 game_active = False
 
+# Defines if it is the 2nd round of obstacles
+second_round = False
+
 # Defines if the ball exists
 ball_on_screen = True
+
+# the score
+score = 0
+
+# attempt
+attempt = 0
 
 # Speed Counters
 counter_4 = 0
@@ -332,6 +394,13 @@ paddle = pygame.sprite.GroupSingle()
 # Ball Group
 ball = pygame.sprite.GroupSingle()
 
+# Text Group
+texts = pygame.sprite.Group()
+
+texts.add(Texto("1", (20, 5)))
+texts.add(Texto(f'{score}', (40, 40)))
+texts.add(Texto(f"{attempt}", (283, 5)))
+
 draw_obstacles()
 start_screen()
 # Game Loop
@@ -344,6 +413,10 @@ while True:
             if game_active is not True:
                 obstacles.empty()
                 draw_obstacles()
+
+                update_attempt()
+
+                reset_score()
 
                 paddle.empty()
                 paddle.add(Paddle(False))
@@ -369,7 +442,9 @@ while True:
     ball.draw(screen)
     ball.update()
 
-    display_score()
+    texts.draw(screen)
+    texts.update()
+
     start_font()
 
     if ball_on_screen is True:
