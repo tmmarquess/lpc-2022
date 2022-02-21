@@ -146,7 +146,6 @@ def ball_obstacle_collision():
     if collision:
 
         for obstacle in collision:
-
             update_score(obstacle.score)
 
             if obstacle.rect.collidepoint(ball.sprite.rect.midtop):
@@ -334,6 +333,7 @@ def ball_death():
     counter_4 = counter_12 = 0
 
     update_attempt()
+
 
 # Function to show an arcade main screen
 def start_screen():
