@@ -136,7 +136,7 @@ def ball_obstacle_collision():
 
         for obstacle in collision:
 
-            current_score += 20
+            current_score += obstacle.score
 
             if obstacle.rect.collidepoint(ball.sprite.rect.midtop):
                 ball.sprite.dy *= -1
