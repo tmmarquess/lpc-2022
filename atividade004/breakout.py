@@ -311,6 +311,8 @@ clock = pygame.time.Clock()
 
 # the game using a default font
 test_font = pygame.font.Font(None, 50)
+
+# the score
 current_score = 0
 
 # Defines if the game is active
