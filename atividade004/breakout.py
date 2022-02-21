@@ -1,5 +1,5 @@
+from random import randint, choice
 import pygame
-from random import choice, randint
 from sys import exit
 
 
@@ -31,6 +31,7 @@ class Ball(pygame.sprite.Sprite):
         self.dy = 2
 
     def update_ball(self):
+        global half_paddle, paddle_sound
 
         self.rect.x += self.dx
         self.rect.y += self.dy
@@ -38,14 +39,24 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.x <= 0:
             self.rect.x = 0
             self.dx *= -1
+            paddle_sound.play().set_volume(0.1)
 
         if self.rect.x >= 516:
             self.rect.x = 516
             self.dx *= -1
+            paddle_sound.play().set_volume(0.1)
 
         if self.rect.y <= 0:
             self.rect.y = 0
             self.dy *= -1
+
+            paddle_sound.play().set_volume(0.1)
+
+            if half_paddle is not True:
+                paddle.sprite.image = pygame.surface.Surface((35 / 2, 15))
+                paddle.sprite.image.fill("#00476D")
+                paddle.sprite.rect = paddle.sprite.image.get_rect(center=paddle.sprite.rect.center)
+                half_paddle = True
 
         if self.rect.y >= 758:
             ball_death()
@@ -101,6 +112,8 @@ class Texto(pygame.sprite.Sprite):
 def ball_paddle_collision():
     collision = pygame.sprite.spritecollide(ball.sprite, paddle, False)
     if collision:
+        global paddle_sound
+        paddle_sound.play().set_volume(0.1)
 
         if collision[0].rect.collidepoint(ball.sprite.rect.midbottom):
             ball.sprite.dy *= -1
@@ -144,8 +157,10 @@ def ball_obstacle_collision():
         collision = pygame.sprite.spritecollide(ball.sprite, obstacles, True)
 
     if collision:
-
+        global break_sound
+        break_sound.play().set_volume(0.1)
         for obstacle in collision:
+
             update_score(obstacle.score)
 
             if obstacle.rect.collidepoint(ball.sprite.rect.midtop):
@@ -268,7 +283,7 @@ def update_score(points):
         texts.sprites()[1].update_text(f"{score}")
 
 
-# game over
+# Function to end the game
 def game_over():
     global game_active, attempt, ball_on_screen
     attempt = 0
@@ -278,6 +293,7 @@ def game_over():
     start_screen()
 
 
+# Function to create Obstacles on screen
 def draw_obstacles():
     # Obstacles coordinates
     x = 0
@@ -297,37 +313,16 @@ def draw_obstacles():
         obstacle_type += 1
 
 
-def draw_obstacles_2():
-    # Obstacles coordinates
-    x = 0
-    y = 80
-
-    # Distance from one obstacle to another
-    dist = 0
-    blocks = 0
-    # type of the obstacle
-    obstacle_type = 0
-    for i in range(4):
-        for j in range(2):
-            for k in range(14):
-                obstacles.add(Obstacle(obstacle_type, (x, y + dist)))
-                x += 38
-                blocks += 1
-
-                if blocks <= 7 and (blocks % 2 == 0):
-                    dist += 17
-                elif blocks >= 8 and (blocks % 2 != 0):
-                    dist -= 17
-            x = 0
-            dist += 17
-            blocks = 0
-        obstacle_type += 1
-
-
 # Function for when the ball dies
 def ball_death():
-    global ball_on_screen, counter_4, counter_12
+    global ball_on_screen, counter_4, counter_12, half_paddle
     ball_on_screen = False
+
+    if half_paddle is True:
+        paddle.sprite.image = pygame.surface.Surface((35, 15))
+        paddle.sprite.image.fill("#00476D")
+        paddle.sprite.rect = paddle.sprite.image.get_rect(midbottom=paddle.sprite.rect.midbottom)
+        half_paddle = False
 
     paddle.sprite.speed = 5
     counter_4 = counter_12 = 0
@@ -356,6 +351,10 @@ pygame.init()
 # Obstacle colors
 colors = ("#9F0800", "#BF6B04", "#008022", "#BFB417")
 
+# Defining sounds
+break_sound = pygame.mixer.Sound("break.mp3")
+paddle_sound = pygame.mixer.Sound("pong_bounce.wav")
+
 # initiating the pygame Screen
 screen = pygame.display.set_mode((263 * 2, 379 * 2))
 pygame.display.set_caption("Breakout")
@@ -375,10 +374,13 @@ second_round = False
 # Defines if the ball exists
 ball_on_screen = True
 
-# the score
+# Defines if the paddle size is half
+half_paddle = False
+
+# Defines the player Score
 score = 0
 
-# attempt
+# Number of the current attempt
 attempt = 0
 
 # Speed Counters
@@ -398,7 +400,7 @@ ball = pygame.sprite.GroupSingle()
 texts = pygame.sprite.Group()
 
 texts.add(Texto("1", (20, 5)))
-texts.add(Texto(f'{score}', (40, 40)))
+texts.add(Texto(f"{score}", (40, 40)))
 texts.add(Texto(f"{attempt}", (283, 5)))
 
 draw_obstacles()
@@ -446,7 +448,7 @@ while True:
     texts.update()
 
     start_font()
-
+    
     if ball_on_screen is True:
         ball_paddle_collision()
         ball_obstacle_collision()
