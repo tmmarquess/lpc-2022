@@ -126,6 +126,7 @@ def ball_paddle_collision():
 
 # Function to check collision between the ball and an obstacle
 def ball_obstacle_collision():
+    global current_score
     if game_active is not True:
         collision = pygame.sprite.spritecollide(ball.sprite, obstacles, False)
     else:
@@ -134,6 +135,8 @@ def ball_obstacle_collision():
     if collision:
 
         for obstacle in collision:
+
+            current_score += 20
 
             if obstacle.rect.collidepoint(ball.sprite.rect.midtop):
                 ball.sprite.dy *= -1
@@ -233,6 +236,42 @@ def draw_obstacles():
         obstacle_type += 1
 
 
+def draw_obstacles_2():
+    # Obstacles coordinates
+    x = 0
+    y = 80
+
+    # Distance from one obstacle to another
+    dist = 0
+    blocks = 0
+    # type of the obstacle
+    obstacle_type = 0
+    for i in range(4):
+        for j in range(2):
+            for k in range(14):
+                obstacles.add(Obstacle(obstacle_type, (x, y + dist)))
+                x += 38
+                blocks += 1
+
+                if blocks <= 7 and (blocks % 2 == 0):
+                    dist += 17
+                elif blocks >= 8 and (blocks % 2 != 0):
+                    dist -= 17
+            x = 0
+            dist += 17
+            blocks = 0
+        obstacle_type += 1
+
+
+def display_score():
+    global current_score, game_active
+    if not game_active:
+        current_score = 0
+    score_surface = test_font.render(f'{current_score}', False, 'White')
+    score_rectangle = score_surface.get_rect(center=(400, 50))
+    screen.blit(score_surface, score_rectangle)
+
+
 # Function for when the ball dies
 def ball_death():
     global ball_on_screen, counter_4, counter_12
@@ -248,6 +287,15 @@ def start_screen():
     ball.add(Ball((randint(20, 506), randint(250, 379))))
 
 
+def start_font():
+    global game_active
+    if game_active:
+        return 0
+    start_surface = test_font.render('Press space key', False, 'White')
+    start_rectangle = start_surface.get_rect(center=(263, 420))
+    screen.blit(start_surface, start_rectangle)
+
+
 # Initializing Pygame Instance
 pygame.init()
 
@@ -260,6 +308,10 @@ pygame.display.set_caption("Breakout")
 
 # the clock that defines the speed of the loop
 clock = pygame.time.Clock()
+
+# the game using a default font
+test_font = pygame.font.Font(None, 50)
+current_score = 0
 
 # Defines if the game is active
 game_active = False
@@ -316,6 +368,9 @@ while True:
 
     ball.draw(screen)
     ball.update()
+
+    display_score()
+    start_font()
 
     if ball_on_screen is True:
         ball_paddle_collision()
