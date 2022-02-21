@@ -267,7 +267,7 @@ def display_score():
     global current_score, game_active
     if not game_active:
         current_score = 0
-    score_surface = test_font.render(f'{current_score}', False, 'White')
+    score_surface = test_font.render(f'Score: {current_score}', False, 'White')
     score_rectangle = score_surface.get_rect(center=(400, 50))
     screen.blit(score_surface, score_rectangle)
 
